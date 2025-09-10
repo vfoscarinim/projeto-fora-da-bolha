@@ -63,15 +63,13 @@ Em tempos de excesso de informações e redes sociais fragmentadas, o **Fora da 
 
 ## Protótipo
 
-**Protótipo visual do site no Canva:**  
-https://www.canva.com/design/DAGymFlNLvA/KO059NpoMaSZdMaq8y-LvA/edit?utm_content=DAGymFlNLvA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+**Protótipo visual do site no Canva:** https://www.canva.com/design/DAGymFlNLvA/KO059NpoMaSZdMaq8y-LvA/edit?utm_content=DAGymFlNLvA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
 ---
 
 ## Mindset
 
-**Mapa mental do site no Canva:**
-https://www.canva.com/design/DAGymUUsnPY/qMrD9SWIRxsesU2vVOm_yQ/edit?utm_content=DAGymUUsnPY&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+**Mapa mental do site no Canva:** https://www.canva.com/design/DAGymUUsnPY/qMrD9SWIRxsesU2vVOm_yQ/edit?utm_content=DAGymUUsnPY&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
 ---
 
