@@ -18,14 +18,14 @@
     min-height: 100vh;
   }
 
-  main {
-    display: flex;
-    gap: 15px;
-    padding: 20px;
-    margin: 30px;
-    background-color: var(--fundo-rosa);
-    border-radius: 20px;
-    min-height: 90vh;
+.container-1 {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  margin: 30px;
+  background-color: var(--fundo-rosa);
+  border-radius: 20px;
+  min-height: 90vh;
 }
   /* ====== SIDEBAR ====== */
   #sidebar {
@@ -143,7 +143,8 @@
   /* Search bar */
   #searchBar {
     background: #f6c4d1;
-    border-radius: 15px;
+    border-radius: 8px;
+    border: #cc3a87 1px solid;
     padding: 8px 15px;
     width: 100%;
     margin-bottom: 20px;
@@ -295,6 +296,54 @@
     cursor: pointer;
   }
 
+  /* ========== MOOD 2 ===========*/
+  .container-2 {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  margin: 30px;
+  margin-top: 60px;
+  background-color: var(--fundo-rosa);
+  border-radius: 20px;
+  min-height: 90vh;
+  font-family: Arial, sans-serif;
+  color: #7c3747;
+}
+
+.abas {
+  background-color: #fde7e7;
+  border-radius: 15px;
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.armario {
+  flex: 2;
+}
+
+p {
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0 0 10px 0;
+  color: #b24a68;
+  letter-spacing: 2px;
+}
+
+.vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(360deg);
+  color: #b24a68;
+  letter-spacing: 2px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  display: flex;
+}
+
   /* ====== RESPONSIVIDADE ====== */
   @media (max-width: 768px) {
     body {
@@ -328,4 +377,17 @@
       flex-wrap: nowrap;
       overflow-x: auto;
     }
+
+    .container-2 {
+    flex-direction: column;
+  }
+
+  .abas {
+    width: 100%;
+  }
+
+  .vertical {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
   }
