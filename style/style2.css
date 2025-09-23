@@ -306,6 +306,7 @@
   background-color: var(--fundo-rosa);
   border-radius: 20px;
   min-height: 90vh;
+  height: 600px;
   font-family: Arial, sans-serif;
   color: #7c3747;
 }
@@ -342,6 +343,89 @@ p {
   align-items: center;
   height: 100%;
   display: flex;
+}
+
+/* ====== ESTILOS DO MODAL ARMÁRIO E GALERIA ====== */
+
+/* Reutilizando o estilo base do modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(214, 79, 141, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #f8e3e6;
+    padding: 20px;
+    border-radius: 20px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-weight: 700;
+    font-size: 1.3em;
+    color: #d64f8d;
+    cursor: pointer;
+}
+
+#formArmario button, #formArmario input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ad6b9c;
+    background-color: #d64f8d;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Estilos da galeria */
+.armario-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.armario-img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button {
+    background-color: #d64f8d;
+    color: white;
+    font-weight: 700;
+    border: none;
+    border-radius: 15px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+.button:hover {
+    background-color: #ad3a6f;
 }
 
   /* ====== RESPONSIVIDADE ====== */

@@ -253,3 +253,103 @@ document.addEventListener('DOMContentLoaded', () => {
         getCurrentlyPlaying(token);
     }
 });
+
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Inicializa o auth do Firebase
+const auth = getAuth();
+let currentUser = null;
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    // Pega os itens do armário do usuário atual
+    getArmarioItems(currentUser.uid);
+  } else {
+    currentUser = null;
+    document.getElementById('armarioImages').innerHTML = '<p>Faça login para ver seu armário.</p>';
+  }
+});
+
+// Referências ao modal e formulário do Armário
+const btnAddArmario = document.getElementById("btnAddArmario");
+const modalArmario = document.getElementById("modalArmario");
+const closeModalArmario = document.getElementById("closeModalArmario");
+const formArmario = document.getElementById("formArmario");
+const armarioImages = document.getElementById("armarioImages");
+
+// --- Abrir e fechar modal do Armário ---
+btnAddArmario.addEventListener("click", () => {
+    if (currentUser) {
+        modalArmario.classList.add("active");
+    } else {
+        alert("Você precisa estar logado para adicionar itens ao armário.");
+    }
+});
+
+closeModalArmario.addEventListener("click", () => {
+    modalArmario.classList.remove("active");
+    formArmario.reset();
+});
+
+// --- Salvar item do Armário no Firestore e Cloudinary ---
+formArmario.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const imagemArquivo = document.getElementById("imagemArmarioUpload").files[0];
+
+    if (!imagemArquivo) {
+        alert("Selecione uma imagem para salvar.");
+        return;
+    }
+
+    try {
+        const imagemURL = await uploadToCloudinary(imagemArquivo);
+
+        // Salva a URL e o ID do usuário na coleção 'armarioItems'
+        await addDoc(collection(db, "armarioItems"), {
+            userId: currentUser.uid,
+            imagemURL: imagemURL,
+            timestamp: serverTimestamp()
+        });
+
+        alert("Imagem salva no seu armário!");
+        modalArmario.classList.remove("active");
+        formArmario.reset();
+
+    } catch (error) {
+        alert("Erro ao salvar imagem no armário: " + error.message);
+        console.error(error);
+    }
+});
+
+// --- Pega e renderiza os itens do armário do usuário logado ---
+function getArmarioItems(userId) {
+    // A query filtra apenas os posts do usuário atual
+    const q = query(collection(db, "armarioItems"), where("userId", "==", userId));
+
+    onSnapshot(q, (snapshot) => {
+        armarioImages.innerHTML = "";
+        if (snapshot.empty) {
+            armarioImages.innerHTML = '<p>Seu armário está vazio. Adicione sua primeira peça!</p>';
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const item = doc.data();
+            const img = document.createElement("img");
+            img.src = item.imagemURL;
+            img.classList.add("armario-img");
+            armarioImages.appendChild(img);
+        });
+    });
+}

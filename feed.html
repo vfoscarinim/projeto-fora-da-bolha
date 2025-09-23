@@ -67,6 +67,20 @@
                     <div class="abas armario">
                         <h2><span class="icon-circle"><i class="fas fa-tshirt"></i></span> ARMÁRIO</h2>
                         <!-- Conteúdo do armário -->
+                            <button id="btnAddArmario" class="button">Adicionar Peça</button>
+                            <div id="armarioImages" class="armario-gallery">
+                    </div>
+
+                        <div id="modalArmario" class="modal-overlay">
+                            <div class="modal-content">
+                                <button id="closeModalArmario" class="close-modal-btn">&times;</button>
+                                <h3>Adicionar Nova Peça ao Armário</h3>
+                                <form id="formArmario">
+                                    <input type="file" id="imagemArmarioUpload" accept="image/*" required/>
+                                    <button type="submit">Salvar no Armário</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="abas comunidades">
