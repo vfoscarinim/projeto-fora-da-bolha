@@ -391,3 +391,95 @@ p {
     transform: none;
   }
   }
+
+  /* ====== ESTILOS DO PLAYER SPOTIFY ====== */
+#moodDia {
+    background: #f8e3e6;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    color: #ad6b9c;
+    font-weight: 600;
+    
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#spotify-player {
+    background-color: #d64f8d;
+    border-radius: 12px;
+    padding: 10px;
+    width: 100%;
+}
+
+.player-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-album-art {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+}
+
+.player-details {
+    flex: 1;
+    text-align: left;
+}
+
+.player-track-name {
+    font-weight: bold;
+    color: white;
+    font-size: 1.1em;
+    margin: 0;
+}
+
+.player-artist-name {
+    color: #f8e3e6;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.player-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+}
+
+.player-progress-bar {
+    background-color: #f8e3e6;
+    height: 4px;
+    border-radius: 2px;
+    width: 100%;
+}
+
+.player-progress {
+    background-color: #ad6b9c;
+    height: 100%;
+    border-radius: 2px;
+}
+
+.player-progress-time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7em;
+    color: #f8e3e6;
+}
+
+.player-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    color: #f8e3e6;
+    font-size: 1.2em;
+}

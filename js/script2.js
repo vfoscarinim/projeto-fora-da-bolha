@@ -154,3 +154,102 @@ btnLimparBusca.addEventListener("click", () => {
 inputSearch.addEventListener("input", () => {
   renderFeed(postsCache);
 });
+
+// =========================================================
+// INTEGRAÇÃO COM SPOTIFY API
+// =========================================================
+
+const CLIENT_ID = '9fd81c38dae94d8f972f6b93fd975426';
+const REDIRECT_URI = 'http://127.0.0.1:5500/feed.html';
+
+const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=user-read-currently-playing`;
+
+const btnLoginSpotify = document.getElementById('btnLoginSpotify');
+const spotifyPlayer = document.getElementById('spotify-player');
+
+// 1. Lida com o clique no botão para iniciar a autenticação
+btnLoginSpotify.addEventListener('click', () => {
+    window.location.href = authUrl;
+});
+
+// 2. Verifica o URL para obter o token de acesso após o redirecionamento
+function getSpotifyAccessToken() {
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    return params.get('access_token');
+}
+
+// 3. Busca a música que está tocando no momento
+async function getCurrentlyPlaying(token) {
+    try {
+        const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.status === 204 || response.status > 400) {
+            spotifyPlayer.innerHTML = 'Nenhuma música tocando.';
+            return;
+        }
+
+        const data = await response.json();
+        renderSpotifyPlayer(data);
+    } catch (error) {
+        console.error('Erro ao buscar música do Spotify:', error);
+        spotifyPlayer.innerHTML = 'Erro ao conectar com Spotify.';
+    }
+}
+
+// 4. Renderiza a interface do player
+function renderSpotifyPlayer(data) {
+    if (!data.item) {
+        spotifyPlayer.innerHTML = 'Nenhuma música tocando.';
+        return;
+    }
+
+    const track = data.item;
+    const albumArt = track.album.images[0].url;
+    const artists = track.artists.map(artist => artist.name).join(', ');
+
+    const progressMs = data.progress_ms;
+    const durationMs = track.duration_ms;
+
+    const progressPercent = (progressMs / durationMs) * 100;
+    
+    spotifyPlayer.innerHTML = `
+        <div class="player-container">
+            <div class="player-info">
+                <img src="${albumArt}" alt="Capa do Álbum" class="player-album-art">
+                <div class="player-details">
+                    <p class="player-track-name">${track.name}</p>
+                    <p class="player-artist-name">${artists}</p>
+                </div>
+            </div>
+            
+            <div class="player-controls">
+                <div class="player-progress-bar">
+                    <div class="player-progress" style="width: ${progressPercent}%;"></div>
+                </div>
+                <div class="player-progress-time">
+                    <span>${(progressMs / 1000).toFixed(0)}</span>
+                    <span>-${((durationMs - progressMs) / 1000).toFixed(0)}</span>
+                </div>
+                <div class="player-buttons">
+                    <i class="fas fa-step-backward"></i>
+                    <i class="fas fa-play"></i>
+                    <i class="fas fa-step-forward"></i>
+                    <i class="fas fa-podcast"></i>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 5. Executa a função principal ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+    const token = getSpotifyAccessToken();
+    if (token) {
+        getCurrentlyPlaying(token);
+    }
+});
