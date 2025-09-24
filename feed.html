@@ -69,6 +69,7 @@
         <!-- Mood 2 -->
             <div>
                 <div class="container-2">
+                    <!-- ARMÁRIO -->
                     <div class="abas armario">
                         <h2><span class="icon-circle"><i class="fas fa-tshirt"></i></span> ARMÁRIO</h2>
                         <!-- Conteúdo do armário -->
@@ -88,16 +89,40 @@
                         </div>
                     </div>
 
+                    <!-- COMUNIDADES -->
                     <div class="abas comunidades">
                         <h2><span class="icon-circle"><i class="fas fa-star"></i></span> COMUNIDADES</h2>
                         <!-- Conteúdo das comunidades -->
+                        <div id="modalComunidade" class="modal">
+                            <div class="modal-content">
+                                <span id="closeModalComunidade" class="close">&times;</span>
+                                <h2>Criar Comunidade</h2>
+                                <form id="formComunidade">
+                                <label for="nomeComunidade">Nome da Comunidade:</label>
+                                <input type="text" id="nomeComunidade" required />
+
+                                <label for="imagemComunidadeUpload">Foto da Comunidade:</label>
+                                <input type="file" id="imagemComunidadeUpload" accept="image/*" required />
+
+                                <button class="button" type="submit">Criar</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Botão para abrir modal -->
+                        <button class="button" id="btnAddComunidade">Criar Comunidade</button>
+
+                        <!-- Lista de Comunidades -->
+                        <div id="listaComunidades"></div>
                     </div>
 
+                    <!-- SEGUINDO -->
                     <div class="abas seguindo">
                         <h2><span class="icon-circle"><i class="fas fa-user-friends"></i></span> SEGUINDO</h2>
                         <!-- Conteúdo seguindo -->
                     </div>
 
+                    <!-- AGORA NO MUNDO -->
                     <div class="abas agora-mundo">
                         <h2 class="vertical"><span class="icon-circle"><i class="fas fa-globe"></i></span> AGORA NO MUNDO</h2>
                     </div>

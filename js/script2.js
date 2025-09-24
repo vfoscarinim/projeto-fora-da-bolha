@@ -387,3 +387,87 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => getCurrentlyPlaying(token), 15000);
   }
 });
+
+
+// =========================
+// COMUNIDADES
+// =========================
+
+const btnAddComunidade = document.getElementById('btnAddComunidade');
+const modalComunidade = document.getElementById('modalComunidade');
+const closeModalComunidade = document.getElementById('closeModalComunidade');
+const formComunidade = document.getElementById('formComunidade');
+const listaComunidades = document.getElementById('listaComunidades');
+
+btnAddComunidade.addEventListener('click', () => {
+  if (!currentUser) {
+    alert("Você precisa estar logado para criar comunidades.");
+    return;
+  }
+  modalComunidade.classList.add('active');
+});
+
+closeModalComunidade.addEventListener('click', () => {
+  modalComunidade.classList.remove('active');
+  formComunidade.reset();
+});
+
+formComunidade.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const nome = document.getElementById('nomeComunidade').value.trim();
+  const imagemArquivo = document.getElementById('imagemComunidadeUpload').files[0];
+
+  if (!nome || !imagemArquivo) {
+    alert('Preencha o nome e selecione uma imagem.');
+    return;
+  }
+
+  try {
+    // Faz upload da imagem para Cloudinary
+    const imagemURL = await uploadToCloudinary(imagemArquivo);
+
+    // Salva no Firestore
+    await addDoc(collection(db, 'comunidades'), {
+      nome,
+      imagemURL,
+      createdBy: currentUser.uid,
+      timestamp: serverTimestamp()
+    });
+
+    alert('Comunidade criada com sucesso!');
+    modalComunidade.classList.remove('active');
+    formComunidade.reset();
+
+  } catch (error) {
+    alert('Erro ao criar comunidade: ' + error.message);
+    console.error(error);
+  }
+});
+
+// Função para renderizar comunidades
+function renderComunidade(comunidade) {
+  return `
+    <div class="comunidade-card">
+      <img src="${comunidade.imagemURL}" alt="Foto da Comunidade" class="comunidade-foto" />
+      <div class="comunidade-nome">${escapeHTML(comunidade.nome)}</div>
+    </div>
+  `;
+}
+
+function getComunidades() {
+  const q = query(collection(db, 'comunidades'), orderBy('timestamp', 'desc'));
+
+  onSnapshot(q, (snapshot) => {
+    if (snapshot.empty) {
+      listaComunidades.innerHTML = '<p>Nenhuma comunidade criada ainda.</p>';
+      return;
+    }
+
+    const comunidades = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    listaComunidades.innerHTML = `<div class="lista-comunidades">${comunidades.map(renderComunidade).join('')}</div>`;
+  });
+}
+
+// Inicializa a lista de comunidades ao carregar a página
+getComunidades();

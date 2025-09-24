@@ -429,6 +429,7 @@ p {
     border-radius: 10px;
     border: 1px solid #ad6b9c;
     background-color: #d64f8d;
+    margin: 10px;
     color: white;
     cursor: pointer;
     font-weight: bold;
@@ -436,16 +437,22 @@ p {
 }
 
 /* Estilos da galeria */
+.armario {
+  flex: 2;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
 .armario-gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     margin-top: 15px;
 }
 
 .armario-img {
     width: 100%;
-    height: 100px;
+    height: 300px;
     object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -459,11 +466,83 @@ p {
     border-radius: 15px;
     padding: 12px;
     cursor: pointer;
+    font-size: 16px;
     transition: background-color 0.3s;
     width: 100%;
 }
 .button:hover {
     background-color: #ad3a6f;
+}
+
+/* COMUNIDADES */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.lista-comunidades {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 300px;
+}
+
+.comunidade-card {
+  background-color: #b73b77; /* cor rosa */
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 10px 10px;
+  gap: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.comunidade-card:hover {
+  background-color: #993366; /* uma variação para hover */
+}
+
+.comunidade-foto {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid white;
+}
+
+.comunidade-nome {
+  color: white;
+  font-weight: 700;
+  font-family: 'Oswald', sans-serif; /* se estiver usando a fonte Oswald */
+  text-transform: uppercase;
+  font-size: 16px;
+  letter-spacing: 1.5px;
 }
 
   /* ====== RESPONSIVIDADE ====== */
