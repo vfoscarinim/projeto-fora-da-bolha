@@ -57,20 +57,49 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+}
+
+.foto-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
   cursor: pointer;
 }
 
 #foto-perfil {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  border-radius: 50%;
   border: 2px solid #ccc;
-  transition: 0.3s;
+  display: block;
 }
 
-#foto-perfil:hover {
-  opacity: 0.8;
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+  pointer-events: none; /* Permite clique passar para a imagem */
+}
+
+.foto-container:hover .overlay {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #input-foto {

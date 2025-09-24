@@ -48,26 +48,40 @@ async function uploadToCloudinary(file) {
 // =========================
 // FOTO DE PERFIL
 // =========================
-const imgPerfil = document.getElementById('foto-perfil');
-    const inputFoto = document.getElementById('input-foto');
+const fotoPerfil = document.getElementById('foto-perfil');
+const inputFoto = document.getElementById('input-foto');
+const container = document.getElementById('foto-container');
 
-    // Quando clicar na imagem, ativa o input
-    imgPerfil.addEventListener('click', () => {
-        inputFoto.click();
-    });
+const ICONE_PADRAO = "https://img.icons8.com/material-rounded/96/user-male-circle.png";
 
-    // Quando escolher uma nova imagem, atualiza a foto
-    inputFoto.addEventListener('change', function () {
-        const file = this.files[0];
-        if (file) {
-            const leitor = new FileReader();
-            leitor.onload = function (e) {
-                imgPerfil.src = e.target.result;
-            };
-            leitor.readAsDataURL(file);
-        }
+// 🔁 Carrega imagem salva no localStorage ao iniciar
+const imagemSalva = localStorage.getItem('fotoPerfil');
+  if (imagemSalva) {
+    fotoPerfil.src = imagemSalva;
+  } else {
+    fotoPerfil.src = ICONE_PADRAO;
+  }
+
+// 📸 Ao clicar na imagem, abre o input
+container.addEventListener('click', () => {
+    inputFoto.click();
 });
 
+// 📥 Quando o usuário escolhe uma nova imagem
+inputFoto.addEventListener('change', function () {
+    const file = this.files[0];
+      if (file) {
+        const leitor = new FileReader();
+        leitor.onload = function (e) {
+            const novaImagem = e.target.result;
+            fotoPerfil.src = novaImagem;
+
+            // 💾 Salva no localStorage
+            localStorage.setItem('fotoPerfil', novaImagem);
+        };
+        leitor.readAsDataURL(file);
+    }
+});
 
 // =========================
 // ELEMENTOS DOM
