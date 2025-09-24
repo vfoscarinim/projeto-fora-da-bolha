@@ -1,37 +1,34 @@
+// =========================
+// FIREBASE & CLOUDINARY
+// =========================
+
 import { db } from "./firebase.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   collection,
   addDoc,
   serverTimestamp,
   onSnapshot,
   query,
-  orderBy
+  orderBy,
+  where,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const btnFazerPost = document.getElementById("btnFazerPost");
-const modalOverlay = document.getElementById("modalOverlay");
-const postForm = document.getElementById("postForm");
-const feedPosts = document.getElementById("feedPosts");
-const closeModalBtn = document.getElementById("closeModalBtn");
-const inputSearch = document.getElementById("inputSearch");
-const btnLimparBusca = document.getElementById("btnLimparBusca");
+const auth = getAuth();
+let currentUser = null;
 
-// Dados Cloudinary - substitua pelos seus
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  if (user) {
+    getArmarioItems(user.uid);
+  } else {
+    document.getElementById('armarioImages').innerHTML = '<p>Faça login para ver seu armário.</p>';
+  }
+});
+
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dyeh43lpp/upload";
 const CLOUDINARY_UPLOAD_PRESET = "fora-da-bolha";
 
-// --- Abrir modal formulário ---
-btnFazerPost.addEventListener("click", () => {
-  modalOverlay.classList.add("active");
-});
-
-// --- Fechar modal e resetar form ---
-closeModalBtn.addEventListener("click", () => {
-  modalOverlay.classList.remove("active");
-  postForm.reset();
-});
-
-// --- Função para upload na Cloudinary ---
 async function uploadToCloudinary(file) {
   const formData = new FormData();
   formData.append("file", file);
@@ -42,15 +39,50 @@ async function uploadToCloudinary(file) {
     body: formData
   });
 
-  if (!response.ok) {
-    throw new Error("Erro ao enviar imagem para Cloudinary");
-  }
+  if (!response.ok) throw new Error("Erro ao enviar imagem para Cloudinary");
 
   const data = await response.json();
-  return data.secure_url; // URL pública da imagem
+  return data.secure_url;
 }
 
-// --- Postar no Firestore com upload Cloudinary ---
+
+// =========================
+// ELEMENTOS DOM
+// =========================
+
+const btnFazerPost = document.getElementById("btnFazerPost");
+const modalOverlay = document.getElementById("modalOverlay");
+const postForm = document.getElementById("postForm");
+const feedPosts = document.getElementById("feedPosts");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const inputSearch = document.getElementById("inputSearch");
+const btnLimparBusca = document.getElementById("btnLimparBusca");
+
+const btnAddArmario = document.getElementById("btnAddArmario");
+const modalArmario = document.getElementById("modalArmario");
+const closeModalArmario = document.getElementById("closeModalArmario");
+const formArmario = document.getElementById("formArmario");
+const armarioImages = document.getElementById("armarioImages");
+
+
+// =========================
+// MODAL POSTS
+// =========================
+
+btnFazerPost.addEventListener("click", () => {
+  modalOverlay.classList.add("active");
+});
+
+closeModalBtn.addEventListener("click", () => {
+  modalOverlay.classList.remove("active");
+  postForm.reset();
+});
+
+
+// =========================
+// FAZER POST
+// =========================
+
 postForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -62,7 +94,6 @@ postForm.addEventListener("submit", async (e) => {
 
   let imagemURLFinal = imagemURLManual;
 
-  // Upload arquivo para Cloudinary se existir
   if (imagemArquivo) {
     try {
       imagemURLFinal = await uploadToCloudinary(imagemArquivo);
@@ -94,7 +125,17 @@ postForm.addEventListener("submit", async (e) => {
   postForm.reset();
 });
 
-// --- Renderizar posts individualmente ---
+
+// =========================
+// FEED DE POSTS
+// =========================
+
+function escapeHTML(str) {
+  return str.replace(/[&<>"']/g, match => ({
+    '&': "&amp;", '<': "&lt;", '>': "&gt;", '"': "&quot;", "'": "&#039;"
+  })[match]);
+}
+
 function renderPost(post) {
   const timeString = post.timestamp
     ? new Date(post.timestamp.toDate()).toLocaleString()
@@ -103,12 +144,12 @@ function renderPost(post) {
   return `
     <div class="post-card">
       <div class="post-header">
-        <div class="post-avatar">${post.usuario.charAt(1)?.toUpperCase() || "?"}</div>
-        <div>${post.usuario}</div>
+        <div class="post-avatar">${post.usuario.charAt(0)?.toUpperCase() || "?"}</div>
+        <div>${escapeHTML(post.usuario)}</div>
       </div>
-      <div class="post-category">em '${post.categoria}'</div>
+      <div class="post-category">em '${escapeHTML(post.categoria)}'</div>
       <img class="post-image" src="${post.imagemURL}" alt="Imagem do post" />
-      <div class="post-caption">${post.legenda}</div>
+      <div class="post-caption">${escapeHTML(post.legenda)}</div>
       <div class="post-timestamp">${timeString}</div>
     </div>
   `;
@@ -116,19 +157,13 @@ function renderPost(post) {
 
 let postsCache = [];
 
-// --- Query para pegar posts em tempo real ordenados por timestamp ---
-const queryPosts = query(
-  collection(db, "posts"),
-  orderBy("timestamp", "desc")
-);
+const queryPosts = query(collection(db, "posts"), orderBy("timestamp", "desc"));
 
-// --- Atualiza feed em tempo real ---
 onSnapshot(queryPosts, (snapshot) => {
   postsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   renderFeed(postsCache);
 });
 
-// --- Renderiza o feed com filtro de busca ---
 function renderFeed(posts) {
   const busca = inputSearch.value.trim().toLowerCase();
   let filteredPosts = posts;
@@ -144,212 +179,174 @@ function renderFeed(posts) {
   feedPosts.innerHTML = filteredPosts.map(renderPost).join("");
 }
 
-// --- Botão limpar busca ---
 btnLimparBusca.addEventListener("click", () => {
   inputSearch.value = "";
   renderFeed(postsCache);
 });
 
-// --- Atualiza feed enquanto digita ---
 inputSearch.addEventListener("input", () => {
   renderFeed(postsCache);
 });
 
-// =========================================================
-// INTEGRAÇÃO COM SPOTIFY API
-// =========================================================
+
+// =========================
+// ARMÁRIO PESSOAL
+// =========================
+
+btnAddArmario.addEventListener("click", () => {
+  if (currentUser) {
+    modalArmario.classList.add("active");
+  } else {
+    alert("Você precisa estar logado para adicionar itens ao armário.");
+  }
+});
+
+closeModalArmario.addEventListener("click", () => {
+  modalArmario.classList.remove("active");
+  formArmario.reset();
+});
+
+formArmario.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const imagemArquivo = document.getElementById("imagemArmarioUpload").files[0];
+
+  if (!imagemArquivo) {
+    alert("Selecione uma imagem para salvar.");
+    return;
+  }
+
+  try {
+    const imagemURL = await uploadToCloudinary(imagemArquivo);
+
+    await addDoc(collection(db, "armarioItems"), {
+      userId: currentUser.uid,
+      imagemURL: imagemURL,
+      timestamp: serverTimestamp()
+    });
+
+    alert("Imagem salva no seu armário!");
+    modalArmario.classList.remove("active");
+    formArmario.reset();
+
+  } catch (error) {
+    alert("Erro ao salvar imagem no armário: " + error.message);
+    console.error(error);
+  }
+});
+
+function getArmarioItems(userId) {
+  const q = query(collection(db, "armarioItems"), where("userId", "==", userId));
+
+  onSnapshot(q, (snapshot) => {
+    armarioImages.innerHTML = "";
+    if (snapshot.empty) {
+      armarioImages.innerHTML = '<p>Seu armário está vazio. Adicione sua primeira peça!</p>';
+      return;
+    }
+
+    snapshot.forEach((doc) => {
+      const item = doc.data();
+      const img = document.createElement("img");
+      img.src = item.imagemURL;
+      img.classList.add("armario-img");
+      armarioImages.appendChild(img);
+    });
+  });
+}
+
+
+// =========================
+// SPOTIFY API
+// =========================
 
 const CLIENT_ID = '9fd81c38dae94d8f972f6b93fd975426';
 const REDIRECT_URI = 'http://127.0.0.1:5500/feed.html';
-
 const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=user-read-currently-playing`;
 
 const btnLoginSpotify = document.getElementById('btnLoginSpotify');
 const spotifyPlayer = document.getElementById('spotify-player');
 
-// 1. Lida com o clique no botão para iniciar a autenticação
 btnLoginSpotify.addEventListener('click', () => {
-    window.location.href = authUrl;
+  window.location.href = authUrl;
 });
 
-// 2. Verifica o URL para obter o token de acesso após o redirecionamento
 function getSpotifyAccessToken() {
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    return params.get('access_token');
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get('access_token');
+
+  if (token) {
+    sessionStorage.setItem('spotifyToken', token);
+    window.location.hash = '';
+  }
+
+  return token || sessionStorage.getItem('spotifyToken');
 }
 
-// 3. Busca a música que está tocando no momento
 async function getCurrentlyPlaying(token) {
-    try {
-        const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+  try {
+    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-        if (response.status === 204 || response.status > 400) {
-            spotifyPlayer.innerHTML = 'Nenhuma música tocando.';
-            return;
-        }
-
-        const data = await response.json();
-        renderSpotifyPlayer(data);
-    } catch (error) {
-        console.error('Erro ao buscar música do Spotify:', error);
-        spotifyPlayer.innerHTML = 'Erro ao conectar com Spotify.';
+    if (response.status === 204 || response.status > 400) {
+      spotifyPlayer.innerHTML = 'Nenhuma música tocando.';
+      return;
     }
+
+    const data = await response.json();
+    renderSpotifyPlayer(data);
+  } catch (error) {
+    console.error('Erro ao buscar música do Spotify:', error);
+    spotifyPlayer.innerHTML = 'Erro ao conectar com Spotify.';
+  }
 }
 
-// 4. Renderiza a interface do player
 function renderSpotifyPlayer(data) {
-    if (!data.item) {
-        spotifyPlayer.innerHTML = 'Nenhuma música tocando.';
-        return;
-    }
+  if (!data.item) {
+    spotifyPlayer.innerHTML = 'Nenhuma música tocando.';
+    return;
+  }
 
-    const track = data.item;
-    const albumArt = track.album.images[0].url;
-    const artists = track.artists.map(artist => artist.name).join(', ');
+  const track = data.item;
+  const albumArt = track.album.images[0].url;
+  const artists = track.artists.map(artist => artist.name).join(', ');
+  const progressMs = data.progress_ms;
+  const durationMs = track.duration_ms;
+  const progressPercent = (progressMs / durationMs) * 100;
 
-    const progressMs = data.progress_ms;
-    const durationMs = track.duration_ms;
-
-    const progressPercent = (progressMs / durationMs) * 100;
-    
-    spotifyPlayer.innerHTML = `
-        <div class="player-container">
-            <div class="player-info">
-                <img src="${albumArt}" alt="Capa do Álbum" class="player-album-art">
-                <div class="player-details">
-                    <p class="player-track-name">${track.name}</p>
-                    <p class="player-artist-name">${artists}</p>
-                </div>
-            </div>
-            
-            <div class="player-controls">
-                <div class="player-progress-bar">
-                    <div class="player-progress" style="width: ${progressPercent}%;"></div>
-                </div>
-                <div class="player-progress-time">
-                    <span>${(progressMs / 1000).toFixed(0)}</span>
-                    <span>-${((durationMs - progressMs) / 1000).toFixed(0)}</span>
-                </div>
-                <div class="player-buttons">
-                    <i class="fas fa-step-backward"></i>
-                    <i class="fas fa-play"></i>
-                    <i class="fas fa-step-forward"></i>
-                    <i class="fas fa-podcast"></i>
-                </div>
-            </div>
+  spotifyPlayer.innerHTML = `
+    <div class="player-container">
+      <div class="player-info">
+        <img src="${albumArt}" alt="Capa do Álbum" class="player-album-art">
+        <div class="player-details">
+          <p class="player-track-name">${track.name}</p>
+          <p class="player-artist-name">${artists}</p>
         </div>
-    `;
+      </div>
+      <div class="player-controls">
+        <div class="player-progress-bar">
+          <div class="player-progress" style="width: ${progressPercent}%;"></div>
+        </div>
+        <div class="player-progress-time">
+          <span>${(progressMs / 1000).toFixed(0)}</span>
+          <span>-${((durationMs - progressMs) / 1000).toFixed(0)}</span>
+        </div>
+        <div class="player-buttons">
+          <i class="fas fa-step-backward"></i>
+          <i class="fas fa-play"></i>
+          <i class="fas fa-step-forward"></i>
+          <i class="fas fa-podcast"></i>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
-// 5. Executa a função principal ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
-    const token = getSpotifyAccessToken();
-    if (token) {
-        getCurrentlyPlaying(token);
-    }
-});
-
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  doc,
-  getDoc,
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  where
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// Inicializa o auth do Firebase
-const auth = getAuth();
-let currentUser = null;
-
-auth.onAuthStateChanged(user => {
-  if (user) {
-    currentUser = user;
-    // Pega os itens do armário do usuário atual
-    getArmarioItems(currentUser.uid);
-  } else {
-    currentUser = null;
-    document.getElementById('armarioImages').innerHTML = '<p>Faça login para ver seu armário.</p>';
+  const token = getSpotifyAccessToken();
+  if (token) {
+    getCurrentlyPlaying(token);
+    setInterval(() => getCurrentlyPlaying(token), 15000);
   }
 });
-
-// Referências ao modal e formulário do Armário
-const btnAddArmario = document.getElementById("btnAddArmario");
-const modalArmario = document.getElementById("modalArmario");
-const closeModalArmario = document.getElementById("closeModalArmario");
-const formArmario = document.getElementById("formArmario");
-const armarioImages = document.getElementById("armarioImages");
-
-// --- Abrir e fechar modal do Armário ---
-btnAddArmario.addEventListener("click", () => {
-    if (currentUser) {
-        modalArmario.classList.add("active");
-    } else {
-        alert("Você precisa estar logado para adicionar itens ao armário.");
-    }
-});
-
-closeModalArmario.addEventListener("click", () => {
-    modalArmario.classList.remove("active");
-    formArmario.reset();
-});
-
-// --- Salvar item do Armário no Firestore e Cloudinary ---
-formArmario.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const imagemArquivo = document.getElementById("imagemArmarioUpload").files[0];
-
-    if (!imagemArquivo) {
-        alert("Selecione uma imagem para salvar.");
-        return;
-    }
-
-    try {
-        const imagemURL = await uploadToCloudinary(imagemArquivo);
-
-        // Salva a URL e o ID do usuário na coleção 'armarioItems'
-        await addDoc(collection(db, "armarioItems"), {
-            userId: currentUser.uid,
-            imagemURL: imagemURL,
-            timestamp: serverTimestamp()
-        });
-
-        alert("Imagem salva no seu armário!");
-        modalArmario.classList.remove("active");
-        formArmario.reset();
-
-    } catch (error) {
-        alert("Erro ao salvar imagem no armário: " + error.message);
-        console.error(error);
-    }
-});
-
-// --- Pega e renderiza os itens do armário do usuário logado ---
-function getArmarioItems(userId) {
-    // A query filtra apenas os posts do usuário atual
-    const q = query(collection(db, "armarioItems"), where("userId", "==", userId));
-
-    onSnapshot(q, (snapshot) => {
-        armarioImages.innerHTML = "";
-        if (snapshot.empty) {
-            armarioImages.innerHTML = '<p>Seu armário está vazio. Adicione sua primeira peça!</p>';
-            return;
-        }
-
-        snapshot.forEach((doc) => {
-            const item = doc.data();
-            const img = document.createElement("img");
-            img.src = item.imagemURL;
-            img.classList.add("armario-img");
-            armarioImages.appendChild(img);
-        });
-    });
-}
