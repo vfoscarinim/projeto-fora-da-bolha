@@ -45,6 +45,29 @@ async function uploadToCloudinary(file) {
   return data.secure_url;
 }
 
+// =========================
+// FOTO DE PERFIL
+// =========================
+const imgPerfil = document.getElementById('foto-perfil');
+    const inputFoto = document.getElementById('input-foto');
+
+    // Quando clicar na imagem, ativa o input
+    imgPerfil.addEventListener('click', () => {
+        inputFoto.click();
+    });
+
+    // Quando escolher uma nova imagem, atualiza a foto
+    inputFoto.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const leitor = new FileReader();
+            leitor.onload = function (e) {
+                imgPerfil.src = e.target.result;
+            };
+            leitor.readAsDataURL(file);
+        }
+});
+
 
 // =========================
 // ELEMENTOS DOM

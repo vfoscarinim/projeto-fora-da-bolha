@@ -53,25 +53,34 @@
   flex-shrink: 0;
 }
 
+#perfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
 
-  #perfil {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+#foto-perfil {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  transition: 0.3s;
+}
 
-  #perfil img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid #ad6b9c;
-  }
+#foto-perfil:hover {
+  opacity: 0.8;
+}
 
-  #perfil span {
-    font-weight: bold;
-    font-size: 1.3em;
-    color: #ad6b9c;
-  }
+#input-foto {
+  display: none;
+}
+
+#perfil span {
+  margin-top: 10px;
+  font-weight: bold;
+}
 
   nav ul {
     list-style: none;
