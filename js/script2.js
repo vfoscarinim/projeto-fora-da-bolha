@@ -297,7 +297,7 @@ function getArmarioItems(userId) {
 // =========================
 
 const CLIENT_ID = '9fd81c38dae94d8f972f6b93fd975426';
-const REDIRECT_URI = 'http://127.0.0.1:5500/feed.html';
+const REDIRECT_URI = 'https://foradabolha.netlify.app/';
 const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=user-read-currently-playing`;
 
 const btnLoginSpotify = document.getElementById('btnLoginSpotify');
@@ -361,20 +361,8 @@ function renderSpotifyPlayer(data) {
           <p class="player-artist-name">${artists}</p>
         </div>
       </div>
-      <div class="player-controls">
-        <div class="player-progress-bar">
-          <div class="player-progress" style="width: ${progressPercent}%;"></div>
-        </div>
-        <div class="player-progress-time">
-          <span>${(progressMs / 1000).toFixed(0)}</span>
-          <span>-${((durationMs - progressMs) / 1000).toFixed(0)}</span>
-        </div>
-        <div class="player-buttons">
-          <i class="fas fa-step-backward"></i>
-          <i class="fas fa-play"></i>
-          <i class="fas fa-step-forward"></i>
-          <i class="fas fa-podcast"></i>
-        </div>
+      <div class="player-progress-bar">
+        <div class="player-progress" style="width: ${progressPercent}%;"></div>
       </div>
     </div>
   `;
@@ -387,7 +375,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => getCurrentlyPlaying(token), 15000);
   }
 });
-
 
 // =========================
 // COMUNIDADES
@@ -471,3 +458,27 @@ function getComunidades() {
 
 // Inicializa a lista de comunidades ao carregar a página
 getComunidades();
+
+
+// =================
+// SEGUINDO
+// =================
+const users = ['@USER-2', '@USER-3', '@USER-4', '@USER-5', '@USER-6'];
+
+// Seleciona o elemento <ul> do HTML
+const userListElement = document.getElementById('user-list');
+
+// Itera sobre a lista de usuários para criar um <li> para cada um
+users.forEach(user => {
+    // Cria um novo elemento <li>
+    const listItem = document.createElement('li');
+
+    // Adiciona uma classe ao <li> para estilização
+    listItem.classList.add('user-item');
+
+    // Define o texto do <li> como o nome do usuário
+    listItem.textContent = user;
+
+    // Adiciona o <li> à lista <ul> no HTML
+    userListElement.appendChild(listItem);
+});
