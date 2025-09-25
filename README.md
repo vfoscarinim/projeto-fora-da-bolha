@@ -81,3 +81,6 @@ Em tempos de excesso de informações e redes sociais fragmentadas, o **Fora da 
 
 ---
 
+#Site do projeto
+https://foradabolha.netlify.app/
+
